@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -18,7 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ERP.CleanDemo.Application\ERP.CleanDemo.Application.csproj" />
     <ProjectReference Include="..\ERP.CleanDemo.Contracts\ERP.CleanDemo.Contracts.csproj" />
-    <ProjectReference Include="..\ERP.CleanDemo.Infrastructure\ERP.CleanDemo.Infrastructure.csproj" />
     <ProjectReference Include="..\ERP.CleanDemo.Persistence\ERP.CleanDemo.Persistence.csproj" />
   </ItemGroup>
 

@@ -7,40 +7,54 @@ namespace ERP.CleanDemo.Persistence.Repositories;
 
 public class ProductRepository : IProductRepository
 {
-    private readonly ApplicationDbContext _db;
-    public ProductRepository(ApplicationDbContext db) => _db = db;
+    private readonly ApplicationDbContext _context;
+    public ProductRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task AddAsync(Product product, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Product>> GetAllAsync()
     {
-        await _db.Products.AddAsync(product, cancellationToken);
-        await _db.SaveChangesAsync(cancellationToken);
+        return await _context.Products
+            .Include(p => p.Category)
+            .AsNoTracking()
+            .ToListAsync();
     }
 
-    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Product?> GetByIdAsync(int id)
     {
-        var entity = await _db.Products.FindAsync(new object[] { id }, cancellationToken);
-        if (entity != null)
-        {
-            _db.Products.Remove(entity);
-            await _db.SaveChangesAsync(cancellationToken);
-        }
+        return await _context.Products
+            .Include(p => p.Category)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<IEnumerable<Product>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        await _db.Products.Include(p => p.Category).AsNoTracking().ToListAsync(cancellationToken);
-
-    public async Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
-        await _db.Products.Include(p => p.Category).AsNoTracking().FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
-
-    public async Task<IEnumerable<Product>> GetByCategoryIdAsync(int categoryId, CancellationToken cancellationToken = default) =>
-        await _db.Products.Where(p => p.CategoryId == categoryId).Include(p => p.Category).AsNoTracking().ToListAsync(cancellationToken);
-
-    public async Task UpdateAsync(Product product, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Product>> GetByCategoryIdAsync(int categoryId)
     {
-        _db.Products.Update(product);
-        await _db.SaveChangesAsync(cancellationToken);
+        return await _context.Products
+            .Where(p => p.CategoryId == categoryId)
+            .Include(p => p.Category)
+            .AsNoTracking()
+            .ToListAsync();
     }
 
-    public async Task<bool> ExistsAsync(int id, CancellationToken cancellationToken = default) =>
-        await _db.Products.AnyAsync(p => p.Id == id, cancellationToken);
+    public async Task AddAsync(Product entity)
+    {
+        _context.Products.Add(entity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(Product entity)
+    {
+        _context.Products.Update(entity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Product entity)
+    {
+        _context.Products.Remove(entity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> ExistsAsync(int id)
+    {
+        return await _context.Products.AnyAsync(p => p.Id == id);
+    }
 }

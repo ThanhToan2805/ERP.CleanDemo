@@ -1,15 +1,23 @@
-﻿using ERP.CleanDemo.Application.Interfaces;
+﻿namespace ERP.CleanDemo.Persistence;
+using ERP.CleanDemo.Application.Interfaces;
+using ERP.CleanDemo.Persistence.Data;
 using ERP.CleanDemo.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-namespace ERP.CleanDemo.Persistence;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddPersistence(this IServiceCollection services)
+    public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        // DbContext setup — chuyển từ API xuống đây
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+        // Register repositories
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+
         return services;
     }
 }

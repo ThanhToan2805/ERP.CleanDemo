@@ -18,9 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ERP.CleanDemo.Application\ERP.CleanDemo.Application.csproj" />
-    <ProjectReference Include="..\ERP.CleanDemo.Contracts\ERP.CleanDemo.Contracts.csproj" />
     <ProjectReference Include="..\ERP.CleanDemo.Domain\ERP.CleanDemo.Domain.csproj" />
-    <ProjectReference Include="..\ERP.CleanDemo.Infrastructure\ERP.CleanDemo.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

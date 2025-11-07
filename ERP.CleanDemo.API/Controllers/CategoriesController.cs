@@ -45,8 +45,11 @@ public class CategoriesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        if (!await _repo.ExistsAsync(id)) return NotFound();
-        await _repo.DeleteAsync(id);
+        var entity = await _repo.GetByIdAsync(id);
+        if (entity == null)
+            return NotFound();
+
+        await _repo.DeleteAsync(entity);
         return NoContent();
     }
 }
