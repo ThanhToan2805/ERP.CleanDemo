@@ -1,6 +1,6 @@
-using ERP.CleanDemo.Application.Interfaces;
+using ERP.CleanDemo.Application.Requests.Categories;
 using ERP.CleanDemo.Contracts.DTOs;
-using ERP.CleanDemo.Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ERP.CleanDemo.API.Controllers;
@@ -9,47 +9,42 @@ namespace ERP.CleanDemo.API.Controllers;
 [Route("api/[controller]")]
 public class CategoriesController : ControllerBase
 {
-    private readonly ICategoryRepository _repo;
-    public CategoriesController(ICategoryRepository repo) => _repo = repo;
+    private readonly IMediator _mediator;
+    public CategoriesController(IMediator mediator) => _mediator = mediator;
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok((await _repo.GetAllAsync()).Select(c => new CategoryDto(c.Id, c.Name)));
+    public async Task<IActionResult> GetAll()
+    {
+        var result = await _mediator.Send(new GetAllCategoriesQuery());
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        var c = await _repo.GetByIdAsync(id);
-        return c == null ? NotFound() : Ok(new CategoryDto(c.Id, c.Name));
+        var result = await _mediator.Send(new GetCategoryByIdQuery(id));
+        return result is null ? NotFound() : Ok(result);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(CategoryCreateDto dto)
     {
-        var entity = new Category { Name = dto.Name };
-        await _repo.AddAsync(entity);
-        return CreatedAtAction(nameof(Get), new { id = entity.Id }, new CategoryDto(entity.Id, entity.Name));
+        var result = await _mediator.Send(new CreateCategoryCommand(dto));
+        return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, CategoryUpdateDto dto)
     {
-        if (id != dto.Id) return BadRequest();
-        var existing = await _repo.GetByIdAsync(id);
-        if (existing == null) return NotFound();
-        existing.Name = dto.Name;
-        await _repo.UpdateAsync(existing);
+        if (id != dto.Id) return BadRequest("Mismatched ID");
+        await _mediator.Send(new UpdateCategoryCommand(dto));
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var entity = await _repo.GetByIdAsync(id);
-        if (entity == null)
-            return NotFound();
-
-        await _repo.DeleteAsync(entity);
+        await _mediator.Send(new DeleteCategoryCommand(id));
         return NoContent();
     }
 }
