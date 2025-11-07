@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<RootNamespace>ERP.CleanDemo.Application</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ERP.CleanDemo.Contracts\ERP.CleanDemo.Contracts.csproj" />
+    <ProjectReference Include="..\ERP.CleanDemo.Domain\ERP.CleanDemo.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
